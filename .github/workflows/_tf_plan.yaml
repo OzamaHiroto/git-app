@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: terraform
 run-name: ${{ github.event.inputs.plan_or_apply }} 🚀 ${{ github.ref }} ${{ github.event.inputs.dir_path }}
 
@@ -27,3 +28,6 @@ on:
         required: true
         default: '~1.6.0'
         type: string
+=======
+
+>>>>>>> 5080ebc1560cbb6a949edae94083e14f64bd1077
