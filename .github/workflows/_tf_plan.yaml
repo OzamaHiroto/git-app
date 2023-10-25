@@ -1,1 +1,29 @@
+name: terraform
+run-name: ${{ github.event.inputs.plan_or_apply }} 🚀 ${{ github.ref }} ${{ github.event.inputs.dir_path }}
 
+on:
+  workflow_dispatch:
+    inputs:
+      plan_or_apply:
+        description: 'plan or apply or refresh-only'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - refresh-only
+      dir_path:
+        description: 'path from modules'
+        required: true
+        default: 'dummy'
+        type: string
+      is_debug:
+        description: 'is debug mode (true or false)'
+        required: true
+        default: 'false'
+      terraform_version:
+        description: 'terraform version'
+        required: true
+        default: '~1.6.0'
+        type: string
