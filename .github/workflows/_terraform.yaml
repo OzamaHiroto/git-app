@@ -1,0 +1,109 @@
+name: terraform
+run-name: ${{ github.event.inputs.plan_or_apply }} 🚀 ${{ github.ref }} ${{ github.event.inputs.dir_path }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      plan_or_apply:
+        description: 'plan or apply or refresh-only'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - refresh-only
+      dir_path:
+        description: 'path from modules'
+        required: true
+        default: 'dummy'
+        type: string
+      is_debug:
+        description: 'is debug mode (true or false)'
+        required: true
+        default: 'false'
+      terraform_version:
+        description: 'terraform version'
+        required: true
+        default: '~1.6.0'
+        type: string
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+      
+    steps:
+    - name: Set env
+      run: |
+        if [[ ${{ github.ref }} = refs/heads/master ]]; then
+          echo "GCLOUD_CREDENTIAL=GCLOUD_CREDENTIAL_PRD" >> $GITHUB_ENV
+          echo "STATE_BUCKET=production__terraform_state" >> $GITHUB_ENV
+          echo "TF_VAR_branch=master" >> $GITHUB_ENV
+        else
+          echo "GCLOUD_CREDENTIAL=GCLOUD_CREDENTIAL_DEV" >> $GITHUB_ENV
+          echo "STATE_BUCKET=develop__terraform_state" >> $GITHUB_ENV
+          echo "TF_VAR_branch=develop" >> $GITHUB_ENV
+        fi
+    
+    - name: Print env
+      run: |
+        dir_path=${{ github.event.inputs.dir_path }}
+        target_dir=${dir_path#*modules/}
+        echo "target_dir=$(echo ${target_dir})" >> $GITHUB_ENV
+        echo "Github ref: ${{ github.ref }}"
+        echo "Input Dir path: ${{ github.event.inputs.dir_path }}"
+    
+    - name: Checkout
+      uses: actions/checkout@v3
+        
+    - name: Move terraform main files
+      run: |
+        echo Target Dir: ${{ env.target_dir }}
+        if [ ! -f modules/${{ env.target_dir }}/versions.tf ]
+        then
+          cp terraform/versions_terraform.tf modules/${{ env.target_dir }}/
+        fi
+        cp terraform/backend.tf terraform/main.tf modules/${{ env.target_dir }}/
+        ls modules/${{ env.target_dir }}
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ${{ github.event.inputs.terraform_version }}
+
+    - name: Terraform Init
+      run: terraform init -backend-config="prefix=${{ env.target_dir }}" -backend-config="bucket=${{ env.STATE_BUCKET }}"
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
+      working-directory: modules/${{ env.target_dir }}
+    
+    - name: Plan
+      run: |
+        if [[ ${{ github.event.inputs.is_debug }} = 'true' ]]; then export TF_LOG=TRACE; fi
+        terraform plan 2>&1
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
+      working-directory: modules/${{ env.target_dir }}
+
+    - name: Apply
+      if: github.event.inputs.plan_or_apply == 'apply'
+      run: |
+        if [[ ${{ github.event.inputs.is_debug }} = 'true' ]]; then export TF_LOG=TRACE; fi
+        terraform apply -auto-approve 2>&1
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
+      working-directory: modules/${{ env.target_dir }}
+
+    - name: Refresh-only
+      if: github.event.inputs.plan_or_apply == 'refresh-only'
+      run: |
+        if [[ ${{ github.event.inputs.is_debug }} = 'true' ]]; then export TF_LOG=TRACE; fi
+        terraform apply -auto-approve -refresh-only 2>&1
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
+      working-directory: modules/${{ env.target_dir }}
