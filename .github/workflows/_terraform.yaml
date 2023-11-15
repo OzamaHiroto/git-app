@@ -53,7 +53,7 @@ jobs:
     - name: Print env
       run: |
         dir_path=${{ github.event.inputs.dir_path }}
-        target_dir=${dir_path#*modules/}
+        target_dir=${dir_path}
         echo "target_dir=$(echo ${target_dir})" >> $GITHUB_ENV
         echo "Github ref: ${{ github.ref }}"
         echo "Input Dir path: ${{ github.event.inputs.dir_path }}"
@@ -64,12 +64,12 @@ jobs:
     - name: Move terraform main files
       run: |
         echo Target Dir: ${{ env.target_dir }}
-        if [ ! -f modules/${{ env.target_dir }}/versions.tf ]
+        if [ ! -f ${{ env.target_dir }}/versions.tf ]
         then
-          cp terraform/versions_terraform.tf modules/${{ env.target_dir }}/
+          cp terraform/versions_terraform.tf ${{ env.target_dir }}/
         fi
-        cp terraform/backend.tf terraform/main.tf modules/${{ env.target_dir }}/
-        ls modules/${{ env.target_dir }}
+        cp terraform/backend.tf terraform/main.tf ${{ env.target_dir }}/
+        ls ${{ env.target_dir }}
     
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
@@ -80,7 +80,7 @@ jobs:
       run: terraform init -backend-config="prefix=${{ env.target_dir }}" -backend-config="bucket=${{ env.STATE_BUCKET }}"
       env:
         GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
-      working-directory: modules/${{ env.target_dir }}
+      working-directory: ${{ env.target_dir }}
     
     - name: Plan
       run: |
@@ -88,7 +88,7 @@ jobs:
         terraform plan 2>&1
       env:
         GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
-      working-directory: modules/${{ env.target_dir }}
+      working-directory: ${{ env.target_dir }}
 
     - name: Apply
       if: github.event.inputs.plan_or_apply == 'apply'
@@ -97,7 +97,7 @@ jobs:
         terraform apply -auto-approve 2>&1
       env:
         GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
-      working-directory: modules/${{ env.target_dir }}
+      working-directory: ${{ env.target_dir }}
 
     - name: Refresh-only
       if: github.event.inputs.plan_or_apply == 'refresh-only'
@@ -106,4 +106,4 @@ jobs:
         terraform apply -auto-approve -refresh-only 2>&1
       env:
         GOOGLE_CREDENTIALS: ${{ secrets[env.GCLOUD_CREDENTIAL] }}
-      working-directory: modules/${{ env.target_dir }}
+      working-directory: ${{ env.target_dir }}
