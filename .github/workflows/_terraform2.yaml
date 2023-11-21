@@ -46,10 +46,12 @@ jobs:
       run: |
         if [[ ${{ github.ref }} = refs/heads/master ]]; then
           echo "project_num=131485906652" >> $GITHUB_ENV
+          echo "project_id=production-403312" >> $GITHUB_ENV
           echo "STATE_BUCKET=production__terraform_state" >> $GITHUB_ENV
           echo "TF_VAR_branch=master" >> $GITHUB_ENV
         else
           echo "project_num=184536460022" >> $GITHUB_ENV
+          echo "project_id=develop-403312" >> $GITHUB_ENV
           echo "STATE_BUCKET=develop__terraform_state" >> $GITHUB_ENV
           echo "TF_VAR_branch=develop" >> $GITHUB_ENV
         fi
@@ -69,8 +71,8 @@ jobs:
       name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v1'
       with:
-        workload_identity_provider: 'projects/131485906652/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions'
-        service_account: 'github-actions-cicd-workflow@production-403312.iam.gserviceaccount.com'
+        workload_identity_provider: 'projects/${{ env.project_num }}/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions'
+        service_account: 'github-actions-cicd-workflow@${{ env.project_id }}.iam.gserviceaccount.com'
         
     - name: Move terraform main files
       run: |
