@@ -1,4 +1,4 @@
-name: terraform
+name: terraform2
 run-name: ${{ github.event.inputs.plan_or_apply }} 🚀 ${{ github.ref }} ${{ github.event.inputs.dir_path }}
 
 on:
