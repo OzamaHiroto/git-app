@@ -66,11 +66,11 @@ jobs:
       uses: actions/checkout@v3
 
     - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
-        with:
-          workload_identity_provider: 'projects/131485906652/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions'
-          service_account: 'github-actions-cicd-workflow@production-403312.iam.gserviceaccount.com'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        workload_identity_provider: 'projects/131485906652/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions'
+        service_account: 'github-actions-cicd-workflow@production-403312.iam.gserviceaccount.com'
         
     - name: Move terraform main files
       run: |
