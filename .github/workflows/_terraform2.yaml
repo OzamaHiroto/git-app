@@ -45,11 +45,11 @@ jobs:
     - name: Set env
       run: |
         if [[ ${{ github.ref }} = refs/heads/master ]]; then
-          echo "GCLOUD_CREDENTIAL=GCLOUD_CREDENTIAL_PRD" >> $GITHUB_ENV
+          echo "project_num=131485906652" >> $GITHUB_ENV
           echo "STATE_BUCKET=production__terraform_state" >> $GITHUB_ENV
           echo "TF_VAR_branch=master" >> $GITHUB_ENV
         else
-          echo "GCLOUD_CREDENTIAL=GCLOUD_CREDENTIAL_DEV" >> $GITHUB_ENV
+          echo "project_num=184536460022" >> $GITHUB_ENV
           echo "STATE_BUCKET=develop__terraform_state" >> $GITHUB_ENV
           echo "TF_VAR_branch=develop" >> $GITHUB_ENV
         fi
