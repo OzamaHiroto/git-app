@@ -92,12 +92,14 @@ jobs:
     - name: Terraform Init
       id: init
       run: terraform init -backend-config="prefix=${{ env.target_dir }}" -backend-config="bucket=${{ env.STATE_BUCKET }}"
+      working-directory: ${{ env.target_dir }}
     
     - name: Plan
       id: plan
       run: |
         if [[ ${{ github.event.inputs.is_debug }} = 'true' ]]; then export TF_LOG=TRACE; fi
         terraform plan 2>&1
+      working-directory: ${{ env.target_dir }}
 
     - name: Apply
       if: github.event.inputs.plan_or_apply == 'apply'
@@ -110,3 +112,4 @@ jobs:
       run: |
         if [[ ${{ github.event.inputs.is_debug }} = 'true' ]]; then export TF_LOG=TRACE; fi
         terraform apply -auto-approve -refresh-only 2>&1
+      working-directory: ${{ env.target_dir }}
