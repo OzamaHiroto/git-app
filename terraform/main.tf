@@ -18,13 +18,8 @@ locals {
 }
 
 provider "google" {
-  region = "us-central1"
-  zone   = "us-central1-c"
-}
-
-provider "google" {
   alias   = "warehouse"
   project = local.GOOGLE_CLOUD_PLATFORM.warehouse.project_id
-  region  = "us-central1"
-  zone    = "us-central1-c"
+  region = "asia-northeast1"
+  zone   = "asia-northeast1-a"
 }
