@@ -1,12 +1,6 @@
 # GCPのAPIを有効化する
 resource "google_project_service" "iamcredentials" {
-  for_each = [
-    "iam.googleapis.com",                  # Identity and Access Management (IAM) API
-    "iamcredentials.googleapis.com",       # IAM Service Account Credentials API
-    "cloudresourcemanager.googleapis.com", # Cloud Resource Manager API
-    "sts.googleapis.com",                  # Security Token Service API
-  ]
-
+  for_each = toset(local.roles)
   project = local.GOOGLE_CLOUD_PLATFORM.warehouse.project_id
   service = each.value
 }
@@ -57,7 +51,7 @@ resource "google_iam_workload_identity_pool_provider" "github_actions" {
 resource "google_service_account_iam_member" "github_actions_iam_workload_identity_user" {
   service_account_id = google_service_account.github_actions.id
   role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/projects/${local.dev.project_num}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.github_actions.workload_identity_pool_id}/attribute.repository/OzamaHiroto/git-app"
+  member             = "principalSet://iam.googleapis.com/projects/${local.GOOGLE_CLOUD_PLATFORM.warehouse.project_id}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.github_actions.workload_identity_pool_id}/attribute.repository/OzamaHiroto/git-app"
   # member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github.name}/attribute.repository/${REPO_NAME}"
 }
 
