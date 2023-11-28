@@ -16,9 +16,9 @@ variable "description" {
 }
 
 variable "location" {
-  description = "The regional location for the dataset only ASIA are allowed in module"
+  description = "The regional location for the dataset only US and EU are allowed in module"
   type        = string
-  default     = "ASIA"
+  default     = "US"
 }
 
 variable "delete_contents_on_destroy" {
