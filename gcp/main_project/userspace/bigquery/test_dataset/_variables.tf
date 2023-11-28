@@ -1,0 +1,5 @@
+locals {
+  authorized_views = [
+    
+  ]
+}
