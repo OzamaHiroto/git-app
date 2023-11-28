@@ -93,10 +93,19 @@ variable "special_group_access" {
 }
 
 variable "authorized_views" {
+  description  = "An array of objects that define authorized views."
+  type         = list(object({
+    project_id = string
+    dataset_id = string
+    table_id   = string
+  }))
+  default      = []
+}
+
+variable "authorized_datasets" {
   description  = "An array of objects that define authorized datasets."
   type         = list(object({
     project_id = string
     dataset_id = string
   }))
   default      = []
-}

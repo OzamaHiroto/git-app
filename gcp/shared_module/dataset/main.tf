@@ -16,7 +16,7 @@ resource  "google_bigquery_dataset" "main" {
   default_table_expiration_ms = var.default_table_expiration_ms
   max_time_travel_hours       = var.max_time_travel_hours
   project                     = var.project_id
-  labels                      = var.dataset_lebals
+  labels                      = var.dataset_labels
   storage_billing_model       = var.storage_billing_model
 
   dynamic "default_encryption_configuration" {
