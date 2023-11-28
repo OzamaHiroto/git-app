@@ -7,7 +7,7 @@ locals {
   authorized_datasets = { for dataset in var.authorized_datasets : "${dataset["project_id"]}_${dataset["dataset_id"]}" => dataset }
 }
 
-resource  "google_bigquery_dataset" "main" (
+resource  "google_bigquery_dataset" "main" {
   dataset_id                  = var.dataset_id
   friendly_name               = var.dataset_name
   description                 = var.description
@@ -47,7 +47,7 @@ resource  "google_bigquery_dataset" "main" (
       }
     }
   }
-)
+}
 
 resource "google_bigquery_dataset_access" "authorized_dataset" {
   for_each   = local.authorized_datasets
