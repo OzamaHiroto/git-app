@@ -106,6 +106,7 @@ jobs:
       run: |
         if [[ ${{ github.event.inputs.is_debug }} = 'true' ]]; then export TF_LOG=TRACE; fi
         terraform apply -auto-approve 2>&1
+      working-directory: ${{ env.target_dir }}
 
     - name: Refresh-only
       if: github.event.inputs.plan_or_apply == 'refresh-only'
